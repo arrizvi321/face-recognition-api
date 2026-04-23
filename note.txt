@@ -1,26 +1,5 @@
-everytime run this to be able to use the py3.10 venv. needed for deepface
 
-Set-ExecutionPolicy -Scope Process Bypass
-.\.venv\Scripts\Activate.ps1
+put 15 of 7 of the celebs in their registered/ folder, and 15 of yourself as well
+total 120
 
-
-so i first add a bunch of images into folders, then the model will read all these images 
-and get their embeddings (so i need to write code for each model to make embeddings for each 
-image and have labels for personA, personB, etc.) then the model compares new query images which
- each embedding. whichever embedding is the closest, it returns that the query is that person.
-
-
-
-Create a prototype face recognition so we can test multiple Deep learning models that can be deployed 
-on the RK3399 Linux board.  
-It should have 2 register and recognition part. System should be able to differentiate 
-the you picture from rest of the pictures from the folder. 
- 
-Test different model and test and give me an excelsheet of model's, where tested,
-how was the result and give me comparisons report that we can integrate in the greeter application.
- 
-For registration take, couple of your pictures and for registration take one picture
-and compare against all the images present in the folder. 
-Aim is to test and identify different model.
-
-
+now put 2 more of everyone in query folder and test them against whole dataset
