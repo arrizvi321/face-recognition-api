@@ -1,5 +1,0 @@
-
-put 15 of 7 of the celebs in their registered/ folder, and 15 of yourself as well
-total 120
-
-now put 2 more of everyone in query folder and test them against whole dataset

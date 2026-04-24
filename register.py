@@ -7,8 +7,8 @@ from deepface import DeepFace
 # -----------------------------
 # Config
 # -----------------------------
-REGISTERED_DIR = "registered"
-OUTPUT_JSON = "outputs/face_db.json"
+REGISTERED_DIR = "Images/registered"
+OUTPUT_JSON = "database/face_db.json"
 
 MODEL_NAME = "SFace"
 DETECTOR_BACKEND = "opencv" 
@@ -36,14 +36,6 @@ def get_embedding(image_path: str) -> List[float]:
 
 def build_database(registered_dir: str) -> List[Dict[str, Any]]:
     """
-    Walk through:
-        registered/
-            person_a/
-                a1.jpg
-                a2.jpg
-            person_b/
-                b1.jpg
-
     Creates one JSON entry per image embedding.
     """
     db: List[Dict[str, Any]] = []

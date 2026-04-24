@@ -1,13 +1,12 @@
 import json
 import math
 from typing import List, Dict, Any, Tuple
-
 from deepface import DeepFace
 
 # -----------------------------
 # Config
 # -----------------------------
-DB_JSON = "outputs/face_db.json"
+DB_JSON = "database/face_db.json"
 
 MODEL_NAME = "SFace"
 DETECTOR_BACKEND = "opencv"
@@ -94,5 +93,5 @@ def recognize_image(image_path: str) -> None:
 
 
 if __name__ == "__main__":
-    test_image = "test/johnydepptest1.jpg"   # change this
+    test_image = "Images/test/johnydepptest1.jpg"   # change this
     recognize_image(test_image)
