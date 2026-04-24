@@ -1,18 +1,15 @@
 import json
 import os
-from typing import List, Dict, Any
 
 DB_PATH = "database/face_db.json"
 
-
-def load_db() -> List[Dict[str, Any]]:
-    if not os.path.exists(DB_PATH):
+def load_db():
+    if not os.path.exists(DB_PATH) or os.path.getsize(DB_PATH) == 0:
         return []
 
-    with open(DB_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+    with open(DB_PATH, "r") as file:
+        return json.load(file)
 
-
-def save_db(data: List[Dict[str, Any]]) -> None:
-    with open(DB_PATH, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+def save_db(db):
+    with open(DB_PATH, "w") as file:
+        json.dump(db, file, indent=4)

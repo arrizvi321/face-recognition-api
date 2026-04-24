@@ -1,10 +1,10 @@
-import math
 import os
 import tempfile
 from typing import List, Dict, Any, Optional
 
 from fastapi import UploadFile
 from deepface import DeepFace
+from deepface.modules.verification import find_distance, find_threshold
 
 from db_service import load_db, save_db
 
@@ -13,22 +13,30 @@ DETECTOR_BACKEND = "opencv"
 DISTANCE_METRIC = "cosine"
 ENFORCE_DETECTION = True
 
-THRESHOLD = 0.35
+THRESHOLD = find_threshold(
+    model_name=MODEL_NAME,
+    distance_metric=DISTANCE_METRIC
+)
 
-ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
 
 def validate_filename(filename: Optional[str]) -> None:
     if not filename:
         return
-
     ext = os.path.splitext(filename)[1].lower()
-
     if ext and ext not in ALLOWED_EXTENSIONS:
         raise ValueError(f"Unsupported file type: {ext}")
 
 
+
 def save_upload_temporarily(upload: UploadFile) -> str:
+    """
+    This is because DeepFace requires image file paths, but the API sends it
+    an UploadFile image object. So the UploadFile image object needs to be 
+    temporarily stored as a file so DeepFace can use it. 
+    """
+
     validate_filename(upload.filename)
 
     suffix = os.path.splitext(upload.filename or "image.jpg")[1] or ".jpg"
@@ -41,17 +49,6 @@ def save_upload_temporarily(upload: UploadFile) -> str:
 
         tmp.write(content)
         return tmp.name
-
-
-def cosine_distance(vec1: List[float], vec2: List[float]) -> float:
-    dot = sum(a * b for a, b in zip(vec1, vec2))
-    norm1 = math.sqrt(sum(a * a for a in vec1))
-    norm2 = math.sqrt(sum(b * b for b in vec2))
-
-    if norm1 == 0 or norm2 == 0:
-        return 1.0
-
-    return 1.0 - (dot / (norm1 * norm2))
 
 
 def get_embedding_from_image(image_path: str) -> List[float]:
@@ -85,7 +82,6 @@ def register_person(person_id: str, image: UploadFile) -> Dict[str, Any]:
             "model": MODEL_NAME,
             "detector": DETECTOR_BACKEND,
             "distance_metric": DISTANCE_METRIC,
-            "source_filename": image.filename,
             "embedding": embedding
         }
 
@@ -125,7 +121,11 @@ def recognize_person(image: UploadFile) -> Dict[str, Any]:
         best_distance = float("inf")
 
         for entry in db:
-            dist = cosine_distance(query_embedding, entry["embedding"])
+            dist = float(find_distance(
+                alpha_embedding=query_embedding,
+                beta_embedding=entry["embedding"],
+                distance_metric=DISTANCE_METRIC
+            ))
 
             if dist < best_distance:
                 best_distance = dist
@@ -172,10 +172,14 @@ def verify_person(person_id: str, image: UploadFile) -> Dict[str, Any]:
         tmp_path = save_upload_temporarily(image)
         query_embedding = get_embedding_from_image(tmp_path)
 
-        best_distance = min(
-            cosine_distance(query_embedding, entry["embedding"])
+        best_distance = float(min(
+            float(find_distance(
+                alpha_embedding=query_embedding,
+                beta_embedding=entry["embedding"],
+                distance_metric=DISTANCE_METRIC
+            ))
             for entry in candidates
-        )
+        ))
 
         verified = best_distance <= THRESHOLD
 
