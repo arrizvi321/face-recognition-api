@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from time import ctime
 
 from face_service import (
     register_person,
@@ -13,7 +14,8 @@ router = APIRouter()
 
 @router.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok",
+            "timestamp": ctime()}
 
 
 @router.post("/register")

@@ -1,7 +1,7 @@
 import os
 import tempfile
 from typing import List, Dict, Any, Optional
-
+from time import ctime
 from fastapi import UploadFile
 from deepface import DeepFace
 from deepface.modules.verification import find_distance, find_threshold
@@ -97,7 +97,7 @@ def register_person(person_id: str, image: UploadFile) -> Dict[str, Any]:
             "message": "Face registered successfully",
             "person_id": person_id.strip(),
             "vectors_for_person": vectors_for_person,
-            "total_vectors": len(db)
+            "timestamp": ctime()
         }
 
     finally:
@@ -147,14 +147,15 @@ def recognize_person(image: UploadFile) -> Dict[str, Any]:
             "distance": best_distance,
             "threshold": THRESHOLD,
             "model": MODEL_NAME,
-            "detector": DETECTOR_BACKEND
+            "detector": DETECTOR_BACKEND,
+            "timestamp": ctime()
         }
 
     finally:
         if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)
 
-
+"""
 def verify_person(person_id: str, image: UploadFile) -> Dict[str, Any]:
     tmp_path = None
 
@@ -190,13 +191,14 @@ def verify_person(person_id: str, image: UploadFile) -> Dict[str, Any]:
             "distance": best_distance,
             "threshold": THRESHOLD,
             "model": MODEL_NAME,
-            "detector": DETECTOR_BACKEND
+            "detector": DETECTOR_BACKEND,
+            "timestamp": ctime()
         }
 
     finally:
         if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)
-
+"""
 
 def list_persons() -> Dict[str, Any]:
     db = load_db()
@@ -210,7 +212,8 @@ def list_persons() -> Dict[str, Any]:
     return {
         "success": True,
         "persons": persons,
-        "total_vectors": len(db)
+        "total_vectors": len(db),
+        "timestamp": ctime()
     }
 
 
@@ -234,5 +237,5 @@ def delete_person(person_id: str) -> Dict[str, Any]:
         "message": "Person deleted from database",
         "person_id": person_id,
         "removed_vectors": removed_count,
-        "remaining_vectors": len(new_db)
+        "timestamp": ctime()
     }
