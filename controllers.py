@@ -5,7 +5,7 @@ from time import ctime
 from face_service import (
     register_person,
     recognize_person,
-    verify_person,
+    #verify_person,
     list_persons,
     delete_person
 )
